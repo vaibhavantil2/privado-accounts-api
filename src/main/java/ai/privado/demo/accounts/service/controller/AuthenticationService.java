@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -54,10 +55,12 @@ public class AuthenticationService {
 	private SlackStub slackStub;
 	private SendGridStub sgStub;
 
+	private String loggerBaseURL;
+
 	@Autowired
 	public AuthenticationService(UserRepository userr, SessionsR sesr, ModelMapper mapper, DataLoggerS datalogger,
 			ObjectMapper objectMapper, @Qualifier("ApiCaller") ExecutorService apiExecutor, SlackStub slackStub,
-			SendGridStub sgStub) {
+			SendGridStub sgStub, @Value("${internal.logger.api.base}") String loggerBaseURL) {
 		super();
 		this.userr = userr;
 		this.sesr = sesr;
@@ -67,6 +70,7 @@ public class AuthenticationService {
 		this.apiExecutor = apiExecutor;
 		this.slackStub = slackStub;
 		this.sgStub = sgStub;
+		this.loggerBaseURL = loggerBaseURL;
 	}
 
 	@PostMapping("/signup")
@@ -152,13 +156,13 @@ public class AuthenticationService {
 	}
 
 	public void sendEvent(String id, String event, String eventData) {
-		String baseURL = "https://localhost/analytics";
 
 		try {
 			String payload = objectMapper.writeValueAsString(eventData);
 			// TODO: pickup the base URL from application.properties
-			HttpResponse<String> response = Unirest.post(baseURL + "/events").header("accept", "application/json")
-					.header("Content-Type", "application/json").body(payload).asString();
+			HttpResponse<String> response = Unirest.post(this.loggerBaseURL + "/events")
+					.header("accept", "application/json").header("Content-Type", "application/json").body(payload)
+					.asString();
 
 			if (response.getStatus() != 200) {
 				logger.error("Error in event logging..");
