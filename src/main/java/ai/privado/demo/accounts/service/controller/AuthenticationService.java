@@ -22,7 +22,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sendgrid.Method;
 import com.sendgrid.Request;
 import com.sendgrid.Response;
-import com.sendgrid.SendGrid;
 import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
@@ -36,7 +35,9 @@ import ai.privado.demo.accounts.service.entity.SessionE;
 import ai.privado.demo.accounts.service.entity.UserE;
 import ai.privado.demo.accounts.service.repos.SessionsR;
 import ai.privado.demo.accounts.service.repos.UserRepository;
+import ai.privado.demo.accounts.thirdparty.SecondClass;
 import ai.privado.demo.accounts.thirdparty.SendGridStub;
+import ai.privado.demo.accounts.thirdparty.SgThirdParty;
 import ai.privado.demo.accounts.thirdparty.SlackStub;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
@@ -89,6 +90,8 @@ public class AuthenticationService {
 			us.setLastName(lastName);
 			us.setPassword(password);
 			us.setPhone(phone);
+			SecondClass sc = new SecondClass();
+			sc.getFirstOne().print(us);
 			UserE saved = userr.save(us);
 			logger.info("New Signup : - " + email + phone);
 			this.sendEvent(UUID.randomUUID().toString(), "SIGNUP", email + phone);
@@ -125,13 +128,12 @@ public class AuthenticationService {
 		Content content = new Content("text/plain", body);
 		Mail mails = new Mail(from, subject, to, content);
 
-		SendGrid sg = new SendGrid("Dummy-api-key");
 		Request request = new Request();
 		try {
 			request.setMethod(Method.POST);
 			request.setEndpoint("mail/send");
 			request.setBody(mails.build());
-			Response response = sg.api(request);
+			Response response = SgThirdParty.getSgClient().api(request);
 			System.out.println(response.getStatusCode());
 			System.out.println(response.getBody());
 			System.out.println(response.getHeaders());
