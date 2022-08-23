@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -55,13 +56,13 @@ public class AuthenticationService {
 	private ObjectMapper objectMapper;
 	private SlackStub slackStub;
 	private SendGridStub sgStub;
-
+	private final Environment env;
 	private String loggerBaseURL;
 
 	@Autowired
 	public AuthenticationService(UserRepository userr, SessionsR sesr, ModelMapper mapper, DataLoggerS datalogger,
 			ObjectMapper objectMapper, @Qualifier("ApiCaller") ExecutorService apiExecutor, SlackStub slackStub,
-			SendGridStub sgStub, @Value("${internal.logger.api.base}") String loggerBaseURL) {
+			SendGridStub sgStub, @Value("${internal.logger.api.base}") String loggerBaseURL, Environment env) {
 		super();
 		this.userr = userr;
 		this.sesr = sesr;
@@ -72,6 +73,7 @@ public class AuthenticationService {
 		this.slackStub = slackStub;
 		this.sgStub = sgStub;
 		this.loggerBaseURL = loggerBaseURL;
+		this.env = env;
 	}
 
 	@PostMapping("/signup")
@@ -95,6 +97,7 @@ public class AuthenticationService {
 			UserE saved = userr.save(us);
 			logger.info("New Signup : - " + email + phone);
 			this.sendEvent(UUID.randomUUID().toString(), "SIGNUP", email + phone);
+			this.anotherDummysendEvent(UUID.randomUUID().toString(), "SIGNUP", email + phone);
 			this.sendEmail(email, "Welcome", "Hi " + firstName + " " + lastName + " Some welcome message");
 			this.sendSlackMessage("someid", "New user Signup - " + email + ", Name - " + firstName + " " + lastName);
 			return mapper.map(saved, UserProfileD.class);
@@ -112,6 +115,7 @@ public class AuthenticationService {
 			String password = login.getPassword();
 			logger.info("Login request : - " + email + "-" + password);
 			this.sendEvent(UUID.randomUUID().toString(), "LOGIN", "Login request : - " + email + "-" + password);
+			this.anotherDummysendEvent(UUID.randomUUID().toString(), "LOGIN", "Login request : - " + email + "-" + password);
 			if (!resp.isEmpty() && login.getPassword().equals(resp.get().getPassword())) {
 				SessionE ses = new SessionE();
 				ses.setUserId(resp.get().getId());
@@ -143,9 +147,9 @@ public class AuthenticationService {
 	}
 
 	public void sendSlackMessage(String id, String message) {
-		var slackWebHookURL = "https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXXXXXX";
+		String slackWebHookURL = env.getProperty("slack.base.url");
 
-		var client = Slack.getInstance();
+		Slack client = Slack.getInstance();
 		try {
 			// Call the chat.postMessage method using the built-in WebClient
 			var result = client.send(slackWebHookURL, message);
@@ -159,12 +163,31 @@ public class AuthenticationService {
 
 	public void sendEvent(String id, String event, String eventData) {
 
+		String base = env.getProperty("internal.logger.api.base");
 		try {
 			String payload = objectMapper.writeValueAsString(eventData);
 			// TODO: pickup the base URL from application.properties
-			HttpResponse<String> response = Unirest.post(this.loggerBaseURL + "/events")
-					.header("accept", "application/json").header("Content-Type", "application/json").body(payload)
-					.asString();
+			HttpResponse<String> response = Unirest.post(base + "/events").header("accept", "application/json")
+					.header("Content-Type", "application/json").body(payload).asString();
+
+			if (response.getStatus() != 200) {
+				logger.error("Error in event logging..");
+			} else {
+				logger.info("Event logging successful");
+			}
+		} catch (UnirestException | IOException e) {
+			logger.error("Event log error:", e);
+		}
+	}
+	
+	public void anotherDummysendEvent(String id, String event, String eventData) {
+
+		String base = "https://www.somexyzapi.com";
+		try {
+			String payload = objectMapper.writeValueAsString(eventData);
+			// TODO: pickup the base URL from application.properties
+			HttpResponse<String> response = Unirest.post(base + "/events").header("accept", "application/json")
+					.header("Content-Type", "application/json").body(payload).asString();
 
 			if (response.getStatus() != 200) {
 				logger.error("Error in event logging..");
