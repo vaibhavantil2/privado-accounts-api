@@ -108,5 +108,4 @@ public class UserE extends BaseE {
 	public void setAdvertisingID(String Advertisingid) {
 		this.advertisingid = advertisingid;
 	}	
-
 }
