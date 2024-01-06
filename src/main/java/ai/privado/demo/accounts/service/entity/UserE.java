@@ -10,6 +10,7 @@ public class UserE extends BaseE {
 
 	private static final long serialVersionUID = 1L;
 
+	
 	@Column(name = "FIRST_NAME", length = 200)
 	private String firstName;
 
