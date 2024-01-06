@@ -109,4 +109,5 @@ public class UserE extends BaseE {
 		this.advertisingid = advertisingid;
 	}	
 
+	
 }
