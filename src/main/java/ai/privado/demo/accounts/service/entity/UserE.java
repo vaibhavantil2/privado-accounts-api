@@ -1,5 +1,4 @@
 package ai.privado.demo.accounts.service.entity;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
