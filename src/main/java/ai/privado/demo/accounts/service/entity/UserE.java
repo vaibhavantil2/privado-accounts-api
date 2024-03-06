@@ -84,7 +84,7 @@ public class UserE extends BaseE {
 		this.dob = dob;
 	}
 	
-/*	public String getDeviceID() {
+	public String getDeviceID() {
 		return deviceid;
 	}
 
@@ -102,7 +102,7 @@ public class UserE extends BaseE {
 
 	public String getAdvertisingID() {
 		return advertisingid;
-*/
+
 	}
 
 	public void setAdvertisingID(String Advertisingid) {
