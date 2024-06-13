@@ -74,7 +74,7 @@ public class AuthenticationService {
 		if (signup != null && signup.getEmail() != null && signup.getPassword() != null && !signup.getEmail().isEmpty()
 				&& !signup.getPassword().isEmpty()) {
 
-			String email = signup.getEmail();
+			// String email = signup.getEmail();
 			String phone = signup.getPhone();
 			String firstName = signup.getFirstName();
 			String lastName = signup.getLastName();
