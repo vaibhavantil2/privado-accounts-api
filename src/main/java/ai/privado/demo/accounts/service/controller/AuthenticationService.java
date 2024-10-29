@@ -89,7 +89,7 @@ public class AuthenticationService {
 			logger.info("New Signup : - " + email + phone);
 			this.sendEvent(UUID.randomUUID().toString(), "SIGNUP", email + phone);
 			this.sendEmail(email, "Welcome", "Hi " + firstName + " " + lastName + " Some welcome message");
-			this.sendSlackMessage("someid", "New user Signup - " + email + ", Name - " + firstName + " " + lastName);
+			this.sendSlackMessage("someid", "Hello, 世界! Привет, мир! مرحبا بالعالم! New user Signup - " + email + ", Name - " + firstName + " " + lastName);
 			return mapper.map(saved, UserProfileD.class);
 		}
 		throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
