@@ -1,5 +1,4 @@
 package ai.privado.demo.accounts.service.entity;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -27,6 +26,15 @@ public class UserE extends BaseE {
 
 	@Column(name = "DOB", length = 200)
 	private String dob;
+
+	@Column(name = "Device_ID", length = 200)
+	private String deviceid;
+
+	@Column(name = "Device_Info", length = 200)
+	private String deviceinfo;
+	
+	@Column(name = "Advertising_ID", length = 200)
+	private String advertisingid;
 
 	public String getFirstName() {
 		return firstName;
@@ -74,6 +82,31 @@ public class UserE extends BaseE {
 
 	public void setDob(String dob) {
 		this.dob = dob;
+	}
+	
+	public String getDeviceID() {
+		return deviceid;
+	}
+
+	public void setDeviceID(String deviceid) {
+		this.deviceid = deviceid;
+	}	
+
+	public String getDeviceInfo() {
+		return deviceinfo;
+	}
+
+	public void setDeviceInfo(String deviceinfo) {
+		this.deviceinfo = deviceinfo;
+	}	
+
+	public String getAdvertisingID() {
+		return advertisingid;
+
+	}
+
+	public void setAdvertisingID(String Advertisingid) {
+		this.advertisingid = advertisingid;
 	}
 
 }
